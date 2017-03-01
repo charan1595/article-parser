@@ -47,9 +47,15 @@ var getRemoteContent = (input) => {
     fetch(url)
       .then((res) => {
         if (res.ok && res.status === 200) {
-          info(`Retrieved HTML content from ${url}`);
-          _url = purify(res.url);
-          return res.text();
+          let contentType = res.headers.get('Content-Type');
+          if(contentType && contentType.indexOf('text/html') !== -1) {
+            info(`Retrieved HTML content from ${url}`);
+            _url = purify(res.url);
+            return res.text();
+          }
+          else {
+            return reject(new Error(`Retrieved content is not HTML for ${url}`));
+          }
         }
         return reject(new Error(`Fetching failed for ${url}`));
       })
